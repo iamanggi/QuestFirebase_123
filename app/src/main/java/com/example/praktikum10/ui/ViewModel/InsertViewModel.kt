@@ -2,6 +2,14 @@ package com.example.praktikum10.ui.ViewModel
 
 import com.example.praktikum10.model.Mahasiswa
 
+
+sealed class FormState{
+    object Idle : FormState()
+    object Loading : FormState() //loading -> kenapa pake object karena merubah state saja tidak merubah data
+    data class Success(val message: String): FormState() //sukses
+    data class Error(val message: String): FormState()  //error
+}
+
 data class MhsUIState(
     val insertUiEvent: MahasiswaEvent = MahasiswaEvent(),
     val isEntryValid: FormErrorState = FormErrorState(),
