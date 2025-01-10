@@ -3,6 +3,7 @@ package com.example.praktikum10.ui.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,18 +12,103 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.praktikum10.ui.ViewModel.FormErrorState
 import com.example.praktikum10.ui.ViewModel.FormState
-import com.example.praktikum10.ui.ViewModel.HomeUiState
 import com.example.praktikum10.ui.ViewModel.InsertUiState
+import com.example.praktikum10.ui.ViewModel.InsertViewModel
 import com.example.praktikum10.ui.ViewModel.MahasiswaEvent
+import com.example.praktikum10.ui.ViewModel.PenyediaViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+
+@Composable
+fun InsertMhsView(
+    onBack:() -> Unit,
+    onNavigate: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: InsertViewModel = viewModel(factory = PenyediaViewModel.Factory)
+) {
+    val uiState = viewModel.uiState //Ambil Ui state dari ViewModel
+    val uiEvent = viewModel.uiEvent
+    val snackbarHostState = remember { SnackbarHostState() } //snackbar state
+    val coroutineScope = rememberCoroutineScope()
+
+    //Observasi perubahan snackbarMessage
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is FormState.Success -> {
+                println("InsertMhsView: uiState is FormState.Success, navigate to home" + uiState.message)
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(uiState.message)
+                }
+                delay(700)
+                onNavigate()
+                viewModel.resetSnackBarMessage()
+            }
+
+            is FormState.Error -> {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(uiState.message)
+                }
+            }
+
+            else -> Unit
+        }
+    }
+    Scaffold(
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, //Tempatkan snackbar di scaffold
+        topBar = {
+            TopAppBar(
+                title = { Text("Tambah Mahasiswa") },
+                navigationIcon = {
+                    Button(onClick = onBack) {
+                        Text("Back")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+            InsertBodyMhs(
+                uiState = uiEvent,
+                homeUiState = uiState,
+                onValueChange = { updatedEvent ->
+                    viewModel.updateState(updatedEvent)
+                },
+                onClick = {
+                    if(viewModel.validateFields()){
+                        viewModel.insertMhs()
+                    }
+                }
+            )
+        }
+    }
+}
+
+
+
 
 @Composable
 fun InsertBodyMhs(
@@ -52,7 +138,9 @@ fun InsertBodyMhs(
             if (homeUiState is FormState.Loading){
                 CircularProgressIndicator(
                     color = Color.White,
-                    modifier = Modifier.size(20.dp).padding(end = 8.dp)
+                    modifier = Modifier
+                        .size(20.dp)
+                        .padding(end = 8.dp)
                 )
                 Text("Loading...")
             } else{
@@ -72,7 +160,9 @@ fun FormMahasiswa(
     val jenisKelamin = listOf("Laki - laki", "Perempuan")
     val kelas = listOf("A", "B", "C", "D", "E")
 
-    Column(modifier = modifier.fillMaxWidth().padding(top = 20.dp))
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(top = 20.dp))
     {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
