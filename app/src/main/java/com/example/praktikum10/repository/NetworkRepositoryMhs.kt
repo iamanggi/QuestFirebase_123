@@ -54,6 +54,9 @@ class NetworkRepositoryMhs(
                    trySend(mhs)
                }
            }
+        awaitClose{
+            mhsDocument.remove()
+        }
     }
 
     override suspend fun deleteMhs(mahasiswa: Mahasiswa) {
