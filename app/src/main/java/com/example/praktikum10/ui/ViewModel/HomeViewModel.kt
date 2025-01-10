@@ -39,6 +39,16 @@ class HomeViewModel(
                 }
         }
     }
+
+    fun deleteMhs(mahasiswa: Mahasiswa){
+        viewModelScope.launch {
+            try {
+                mhs.deleteMhs(mahasiswa)
+            } catch (e: Exception){
+                mhsUiState = HomeUiState.Error(e)
+            }
+        }
+    }
 }
 
 //kebutuhan di home yaitu ketika loading, sukses, dan error
