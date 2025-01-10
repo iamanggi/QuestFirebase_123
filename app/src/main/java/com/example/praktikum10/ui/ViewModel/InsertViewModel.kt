@@ -26,7 +26,7 @@ class InsertViewModel  (
 
     }
 
-    private fun validateFields(): Boolean{
+    fun validateFields(): Boolean{
         val event = uiEvent.insertUiEvent
         val errorState = FormErrorState(
             nim = if (event.nim.isNotEmpty()) null else "NIM tidak boleh kosong",
@@ -57,7 +57,7 @@ class InsertViewModel  (
         }
     }
 
-    fun reserForm(){
+    fun resetForm(){
         uiEvent = InsertUiState()
         uiState = FormState.Idle
     }
