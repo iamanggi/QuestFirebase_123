@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -37,7 +38,7 @@ import com.example.praktikum10.ui.ViewModel.PenyediaViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InsertMhsView(
     onBack:() -> Unit,
@@ -73,7 +74,7 @@ fun InsertMhsView(
         }
     }
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.padding(16.dp),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, //Tempatkan snackbar di scaffold
         topBar = {
             TopAppBar(
